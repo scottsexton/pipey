@@ -1,0 +1,19 @@
+Run from command prompt $> python pipey.py
+
+An example of Pipes and Filters designed to work similarly to the UNIX pipe.
+Reads a list of test data (names of Nobel prize winners in physics) and enqueues
+them in a pipe. The CapsFilter runs in its own process and continuously reads 
+from the Pipe. While this is happening, the WriteFilter opens the sample data 
+file and writes each line onto the Pipe. The CapsFilter takes each line off the 
+Pipe as it finds them and runs it through its capitalize() method, then prints the 
+result to standard out. It keeps trying to read from the Pipe until there is no
+more data on it and it's marked as closed--meaning no more data will be 
+arriving. The Pipe uses a multiprocessing.Queue() to pass the data, which is
+like a collections.deque that exists in shared memory. This way both filters
+can access it despite being in different processes. I also defined a closed
+property on Pipe that provides read-only access to the shared memory
+multiprocessing.Value().value stored in _closed. To make it possible to see
+what's happening in this example, I added a module-level lagify() function that
+will randomly delay by 1 second the read or write action to the Pipe. This
+makes it easy to see when the WriteFilter finishes writing as theCapsFilter
+keeps reading.
